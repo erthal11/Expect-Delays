@@ -34,7 +34,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
 {
     std::vector <std::unique_ptr<juce::RangedAudioParameter>> params;
     
-    auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", 0.01f,192000.f,192000.f);
+    auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", 1,7,5);
     params.push_back(std::move(rateParam));
     
     auto fbParam = std::make_unique<juce::AudioParameterFloat>("feedback","Feedback", -100.f,0.f,-100.f);
@@ -150,6 +150,11 @@ bool ExpectDelaysAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 }
 #endif
 
+int noteValRec(int x){
+    if (x==1) return x;
+    else return 2*(noteValRec(x-1));
+}
+
 void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -161,7 +166,8 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
      
     int bpm = currentPositionInfo.bpm;
     
-    float quarterNoteValue = (double)60/bpm * (double)lastSampleRate;
+    
+    float sixtyFourthNoteValue = (60.0/bpm * lastSampleRate)/16;
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
@@ -187,7 +193,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
             //delayLine.setDelay(sliderRateValue->load());
-            delayLine.setDelay(quarterNoteValue);
+            delayLine.setDelay(noteValRec(sliderRateValue->load()) * sixtyFourthNoteValue);
             delayLine.pushSample(channel, channelData[sample]);
             
             channelData[sample] = delayLine.popSample(channel);
