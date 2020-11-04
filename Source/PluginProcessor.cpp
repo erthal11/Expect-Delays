@@ -152,17 +152,17 @@ bool ExpectDelaysAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 #endif
 
 //returns note multiplyer for 64th note value
-double noteValRec(double x)
+double noteMult(double x)
 {
     if (fmod(x,2) != 0)
     {
         if (x==1) return x;
-        else return (2*(noteValRec(x-2)));
+        else return (2*(noteMult(x-2)));
     }
     else
     {
         if (x==2) return (4.0/3);
-        else return (2*(noteValRec(x-2)));
+        else return (2*(noteMult(x-2)));
     }
 }
 
@@ -201,45 +201,12 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         auto* channelData = buffer.getWritePointer (channel);
         auto sliderRateValue = treeState.getRawParameterValue("rate");
         
-//        switch ((int)(sliderRateValue->load()))
-//        {
-//            // 64th
-//            case 1: noteVal = sixtyFourthNote;
-//                break;
-//            // 32nd triplet
-//            case 2: noteVal = sixtyFourthNote*2.0 *(3.0/4);
-//                break;
-//            // 32nd
-//            case 3: noteVal = sixtyFourthNote*2;
-//                break;
-//            // 16th triplet
-//            case 4: noteVal = sixtyFourthNote*4.0 *(3.0/4);
-//                break;
-//            // 16th
-//            case 5: noteVal = sixtyFourthNote*4;
-//                break;
-//            // 8th triplet
-//            case 6: noteVal = sixtyFourthNote*8.0 *(3.0/4);
-//                break;
-//            // 8th
-//            case 7: noteVal = sixtyFourthNote*8;
-//                break;
-//            // 1/4 triplet
-//            case 8: noteVal = sixtyFourthNote*16.0 - (1/3)*(sixtyFourthNote*16 - sixtyFourthNote*8);
-//                break;
-//            // 1/4
-//            case 9: noteVal = sixtyFourthNote*16;
-//                break;
-//            default: noteVal = sixtyFourthNote*16;
-//        }
-    
 
         // ..do something to the data...
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
-            //delayLine.setDelay(sliderRateValue->load());
-            delayLine.setDelay(noteValRec(sliderRateValue->load()) * sixtyFourthNote);
-            //delayLine.setDelay(noteVal);
+            
+            delayLine.setDelay(noteMult(sliderRateValue->load()) * sixtyFourthNote);
             delayLine.pushSample(channel, channelData[sample]);
             
             channelData[sample] = delayLine.popSample(channel);
