@@ -55,10 +55,17 @@ public:
     
     juce::AudioProcessorValueTreeState treeState;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    
+    void updateDelay();
 
 private:
     
     float lastSampleRate;
+    
+    double noteVal;
+    
+    int lastbpm;
+    
     
     juce::dsp::DelayLine <float> delayLine {192000};
     

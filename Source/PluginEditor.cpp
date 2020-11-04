@@ -27,6 +27,7 @@ ExpectDelaysAudioProcessorEditor::ExpectDelaysAudioProcessorEditor (ExpectDelays
     rateValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.treeState, "rate", rateSlider);
     
     
+    
     fbSlider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
     fbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 25);
 //    fbSlider.setRange(0, 2);
@@ -60,7 +61,11 @@ void ExpectDelaysAudioProcessorEditor::resized()
     fbSlider.setBounds(getWidth()/2+70, getHeight()/2, 110, 115);
 }
 
+
 void ExpectDelaysAudioProcessorEditor::sliderValueChanged (juce::Slider* slider)
 {
+    if (slider == &rateSlider){
+        rateSlider.snapValue(4.0, juce::Slider::DragMode::absoluteDrag);
+    }
 
 }

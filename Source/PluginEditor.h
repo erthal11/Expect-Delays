@@ -26,7 +26,11 @@ public:
     void resized() override;
     
     void sliderValueChanged (juce::Slider* sliderGain) override;
+    
+//    virtual double snapValues (std::vector<double> attemptedValues, juce::Slider::DragMode dragMode) override;
 
+    //virtual double snapValue (double attemptedValue, juce::Slider::DragMode dragMode) override;
+    
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

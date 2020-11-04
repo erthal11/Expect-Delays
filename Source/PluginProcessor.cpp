@@ -33,8 +33,9 @@ ExpectDelaysAudioProcessor::~ExpectDelaysAudioProcessor()
 juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::createParameterLayout()
 {
     std::vector <std::unique_ptr<juce::RangedAudioParameter>> params;
+    auto normRange = juce::NormalisableRange<float>(1.0,13.0,1);
     
-    auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", 1,7,5);
+    auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", normRange,5.0);
     params.push_back(std::move(rateParam));
     
     auto fbParam = std::make_unique<juce::AudioParameterFloat>("feedback","Feedback", -100.f,0.f,-100.f);
@@ -150,9 +151,19 @@ bool ExpectDelaysAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 }
 #endif
 
-int noteValRec(int x){
-    if (x==1) return x;
-    else return 2*(noteValRec(x-1));
+//returns note multiplyer for 64th note value
+double noteValRec(double x)
+{
+    if (fmod(x,2) != 0)
+    {
+        if (x==1) return x;
+        else return (2*(noteValRec(x-2)));
+    }
+    else
+    {
+        if (x==2) return (4.0/3);
+        else return (2*(noteValRec(x-2)));
+    }
 }
 
 void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
@@ -166,9 +177,9 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
      
     int bpm = currentPositionInfo.bpm;
     
+    float const sixtyFourthNote = (60.0/bpm * lastSampleRate)/16.0;
     
-    float sixtyFourthNoteValue = (60.0/bpm * lastSampleRate)/16;
-
+    
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -184,22 +195,56 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+    
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
         auto sliderRateValue = treeState.getRawParameterValue("rate");
+        
+//        switch ((int)(sliderRateValue->load()))
+//        {
+//            // 64th
+//            case 1: noteVal = sixtyFourthNote;
+//                break;
+//            // 32nd triplet
+//            case 2: noteVal = sixtyFourthNote*2.0 *(3.0/4);
+//                break;
+//            // 32nd
+//            case 3: noteVal = sixtyFourthNote*2;
+//                break;
+//            // 16th triplet
+//            case 4: noteVal = sixtyFourthNote*4.0 *(3.0/4);
+//                break;
+//            // 16th
+//            case 5: noteVal = sixtyFourthNote*4;
+//                break;
+//            // 8th triplet
+//            case 6: noteVal = sixtyFourthNote*8.0 *(3.0/4);
+//                break;
+//            // 8th
+//            case 7: noteVal = sixtyFourthNote*8;
+//                break;
+//            // 1/4 triplet
+//            case 8: noteVal = sixtyFourthNote*16.0 - (1/3)*(sixtyFourthNote*16 - sixtyFourthNote*8);
+//                break;
+//            // 1/4
+//            case 9: noteVal = sixtyFourthNote*16;
+//                break;
+//            default: noteVal = sixtyFourthNote*16;
+//        }
+    
 
         // ..do something to the data...
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
             //delayLine.setDelay(sliderRateValue->load());
-            delayLine.setDelay(noteValRec(sliderRateValue->load()) * sixtyFourthNoteValue);
+            delayLine.setDelay(noteValRec(sliderRateValue->load()) * sixtyFourthNote);
+            //delayLine.setDelay(noteVal);
             delayLine.pushSample(channel, channelData[sample]);
             
             channelData[sample] = delayLine.popSample(channel);
         }
     }
-    //std::cout << delayLine.getDelay();
 
 }
 
