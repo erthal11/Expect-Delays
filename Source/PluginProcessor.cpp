@@ -211,12 +211,15 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             delayLine.setDelay(noteMult(sliderRateValue->load()) * sixtyFourthNote);
             delayLine.pushSample(channel, channelData[sample]);
             
+            //samplesToPop initialized at 1
+            channelData[sample] = delayLine.popSample(channel)*samplesToPop;
             
-            channelData[sample] = delayLine.popSample(channel);
+            samplesToPop = 0;
             
             for (int fb = 0; fb<feedBackValue->load(); ++ fb)
             {
                 delayLine.pushSample(channel, channelData[sample]);
+                samplesToPop ++;
             }
             
         }
