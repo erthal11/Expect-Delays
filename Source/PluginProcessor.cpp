@@ -38,7 +38,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", normRange,5.0);
     params.push_back(std::move(rateParam));
     
-    auto fbParam = std::make_unique<juce::AudioParameterFloat>("feedback","Feedback", -100.f,0.f,-100.f);
+    auto fbParam = std::make_unique<juce::AudioParameterFloat>("feedback","Feedback", 0, 16, 0);
     params.push_back(std::move(fbParam));
     
     return { params.begin(), params.end() };
@@ -151,6 +151,7 @@ bool ExpectDelaysAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 }
 #endif
 
+// knob parameters are shifted 2 to the left?
 //returns note multiplyer for 64th note value
 double noteMult(double x)
 {
@@ -200,6 +201,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     {
         auto* channelData = buffer.getWritePointer (channel);
         auto sliderRateValue = treeState.getRawParameterValue("rate");
+        auto feedBackValue = treeState.getRawParameterValue("feedback");
         
 
         // ..do something to the data...
@@ -209,8 +211,16 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             delayLine.setDelay(noteMult(sliderRateValue->load()) * sixtyFourthNote);
             delayLine.pushSample(channel, channelData[sample]);
             
+            
             channelData[sample] = delayLine.popSample(channel);
+            
+            for (int fb = 0; fb<feedBackValue->load(); ++ fb)
+            {
+                delayLine.pushSample(channel, channelData[sample]);
+            }
+            
         }
+        
     }
 
 }
