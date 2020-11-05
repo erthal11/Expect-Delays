@@ -67,6 +67,7 @@ private:
     int lastbpm;
     
     int samplesToPop = 1;
+    float totalSamples = 0;
     
     
     juce::dsp::DelayLine <float> delayLine {192000};

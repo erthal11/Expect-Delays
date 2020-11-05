@@ -38,7 +38,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", normRange,5.0);
     params.push_back(std::move(rateParam));
     
-    auto fbParam = std::make_unique<juce::AudioParameterFloat>("feedback","Feedback", 0, 16, 0);
+    auto fbParam = std::make_unique<juce::AudioParameterFloat>("feedback","Feedback", 0, 1, 0);
     params.push_back(std::move(fbParam));
     
     return { params.begin(), params.end() };
@@ -151,13 +151,13 @@ bool ExpectDelaysAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 }
 #endif
 
-// knob parameters are shifted 2 to the left?
-//returns note multiplyer for 64th note value
+
+//returns note multiplyer for 64th note value (missing dotted notes)
 double noteMult(double x)
 {
     if (fmod(x,2) != 0)
     {
-        if (x==1) return x;
+        if (x==1) return 1;
         else return (2*(noteMult(x-2)));
     }
     else
@@ -179,6 +179,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     int bpm = currentPositionInfo.bpm;
     
     float const sixtyFourthNote = (60.0/bpm * lastSampleRate)/16.0;
+    float output = 0;
     
     
     // In case we have more outputs than inputs, this code clears any output
@@ -200,27 +201,29 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
-        auto sliderRateValue = treeState.getRawParameterValue("rate");
-        auto feedBackValue = treeState.getRawParameterValue("feedback");
         
-
+        auto rate = (treeState.getRawParameterValue("rate"));
+        auto feedback = (treeState.getRawParameterValue("feedback"));
+        std::cout << feedback->load();
+        delayLine.setDelay(noteMult(rate->load()) * sixtyFourthNote);
+        
         // ..do something to the data...
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
+            output = delayLine.popSample(channel);
+            delayLine.pushSample(channel, channelData[sample] + feedback->load() * output);
+            channelData[sample] += output;
             
-            delayLine.setDelay(noteMult(sliderRateValue->load()) * sixtyFourthNote);
-            delayLine.pushSample(channel, channelData[sample]);
             
-            //samplesToPop initialized at 1
-            channelData[sample] = delayLine.popSample(channel)*samplesToPop;
             
-            samplesToPop = 0;
-            
-            for (int fb = 0; fb<feedBackValue->load(); ++ fb)
-            {
-                delayLine.pushSample(channel, channelData[sample]);
-                samplesToPop ++;
-            }
+//            for (int fb=0; fb<feedback->load(); fb++) {
+//                delayLine.pushSample(channel, channelData[sample]);
+//            }
+//
+//            for (int fb=0; fb<feedback->load(); fb++) {
+//                channelData[sample] += delayLine.popSample(channel);
+//            }
+            //channelData[sample] = delayLine.popSample(channel);
             
         }
         
