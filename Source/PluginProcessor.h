@@ -57,18 +57,13 @@ public:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     
     void updateDelay();
+    
+    foleys::MagicProcessorState magicState { *this, treeState };
+
 
 private:
     
     float lastSampleRate;
-    
-    double noteVal;
-    
-    int lastbpm;
-    
-    int samplesToPop = 1;
-    float totalSamples = 0;
-    
     
     juce::dsp::DelayLine <float> delayLine {192000};
     

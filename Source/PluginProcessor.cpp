@@ -38,8 +38,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", normRange,5.0);
     params.push_back(std::move(rateParam));
     
-    auto fbParam = std::make_unique<juce::AudioParameterFloat>("feedback","Feedback", 0, 1, 0);
-    params.push_back(std::move(fbParam));
+    auto fbLParam = std::make_unique<juce::AudioParameterFloat>("feedbackL","FeedbackL", 0, 1, 0.5);
+    params.push_back(std::move(fbLParam));
+    
+    auto fbRParam = std::make_unique<juce::AudioParameterFloat>("feedbackR","FeedbackR", 0, 1, 0.5);
+    params.push_back(std::move(fbRParam));
+    
+    auto mixParam = std::make_unique<juce::AudioParameterFloat>("mix","Mix", 0, 1, 0.5);
+    params.push_back(std::move(mixParam));
+    
+    auto pingpongParam = std::make_unique<juce::AudioParameterBool>("pingpong","Pingpong", false);
+    params.push_back(std::move(pingpongParam));
     
     return { params.begin(), params.end() };
 }
@@ -179,55 +188,58 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     int bpm = currentPositionInfo.bpm;
     
     float const sixtyFourthNote = (60.0/bpm * lastSampleRate)/16.0;
-    float output = 0;
+    
+    float outputL = 0;
+    float outputR = 0;
     
     
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
     
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    float *cleanSignalL = new float[buffer.getNumSamples()];
+    float *cleanSignalR = new float[buffer.getNumSamples()];
+
+    
+        auto* channelDataL = buffer.getWritePointer (0);
+        auto* channelDataR = buffer.getWritePointer (1);
+    
+    for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
     {
-        auto* channelData = buffer.getWritePointer (channel);
+        cleanSignalL[sample] = channelDataL[sample];
+        cleanSignalR[sample] = channelDataR[sample];
+    }
         
-        auto rate = (treeState.getRawParameterValue("rate"));
-        auto feedback = (treeState.getRawParameterValue("feedback"));
-        std::cout << feedback->load();
+        auto rate = treeState.getRawParameterValue("rate");
+        auto feedbackL = treeState.getRawParameterValue("feedbackL");
+        auto feedbackR = treeState.getRawParameterValue("feedbackR");
+        auto mix = treeState.getRawParameterValue("mix");
+        
         delayLine.setDelay(noteMult(rate->load()) * sixtyFourthNote);
         
-        // ..do something to the data...
+
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
-            output = delayLine.popSample(channel);
-            delayLine.pushSample(channel, channelData[sample] + feedback->load() * output);
-            channelData[sample] += output;
+            outputL = delayLine.popSample(0);
+            delayLine.pushSample(0, channelDataL[sample] + feedbackL->load() * outputL);
+            channelDataL[sample] = outputL;
             
-            
-            
-//            for (int fb=0; fb<feedback->load(); fb++) {
-//                delayLine.pushSample(channel, channelData[sample]);
-//            }
-//
-//            for (int fb=0; fb<feedback->load(); fb++) {
-//                channelData[sample] += delayLine.popSample(channel);
-//            }
-            //channelData[sample] = delayLine.popSample(channel);
-            
+            outputR = delayLine.popSample(1);
+            delayLine.pushSample(1, channelDataR[sample] + feedbackR->load() * outputR);
+            channelDataR[sample] = outputR;
         }
         
-    }
+        //filtering goes here
+        //
+        
+        // mixing dry + wet
+        for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
+        {
+            channelDataL[sample] = (channelDataL[sample] * mix->load()) + (cleanSignalL[sample] * (1-mix->load()));
+            
+            channelDataR[sample] = (channelDataR[sample] * mix->load()) + (cleanSignalR[sample] * (1-mix->load()));
+        }
+        
+    
 
 }
 
@@ -239,7 +251,8 @@ bool ExpectDelaysAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* ExpectDelaysAudioProcessor::createEditor()
 {
-    return new ExpectDelaysAudioProcessorEditor (*this);
+    //return new ExpectDelaysAudioProcessorEditor (*this);
+    return new foleys::MagicPluginEditor (magicState);
 }
 
 //==============================================================================

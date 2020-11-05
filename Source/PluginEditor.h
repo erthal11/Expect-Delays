@@ -38,11 +38,19 @@ private:
     
     juce::Slider rateSlider;
     juce::Slider fbSlider;
+    juce::Slider mixSlider;
+    
+    juce::TextButton pingPongButton {"ping-pong"};
     
 public:
     
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> rateValue;
+    
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> fbValue;
+    
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> mixValue;
+    
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> pingPongValue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ExpectDelaysAudioProcessorEditor)
 };

@@ -81,6 +81,10 @@
 			isa = PBXBuildFile;
 			fileRef = CBF893D6EEF9AA8791EDC3AD;
 		};
+		5424BCC93F1048ED995BB526 = {
+			isa = PBXBuildFile;
+			fileRef = 68AF399B730A506C794603A1;
+		};
 		AFCF6152ED3DBF06D2160C8D = {
 			isa = PBXBuildFile;
 			fileRef = 0509E71BB07F6E7CA3731967;
@@ -255,6 +259,13 @@
 			path = System/Library/Frameworks/CoreAudioKit.framework;
 			sourceTree = SDKROOT;
 		};
+		5236A92F0A4AC5584953037A = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = "include_juce_audio_plugin_client_VST3.cpp";
+			path = "../../JuceLibraryCode/include_juce_audio_plugin_client_VST3.cpp";
+			sourceTree = "SOURCE_ROOT";
+		};
 		52809AA41EF4FA1D1ABA3C67 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
@@ -297,13 +308,6 @@
 			path = "Expect Delays.component";
 			sourceTree = "BUILT_PRODUCTS_DIR";
 		};
-		5236A92F0A4AC5584953037A = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = "include_juce_audio_plugin_client_VST3.cpp";
-			path = "../../JuceLibraryCode/include_juce_audio_plugin_client_VST3.cpp";
-			sourceTree = "SOURCE_ROOT";
-		};
 		53C7D758C811EC41994A6B89 = {
 			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
@@ -345,6 +349,20 @@
 			name = Accelerate.framework;
 			path = System/Library/Frameworks/Accelerate.framework;
 			sourceTree = SDKROOT;
+		};
+		64510212442C3F8F729CAC0A = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = "foleys_gui_magic";
+			path = "../../modules/foleys_gui_magic";
+			sourceTree = "SOURCE_ROOT";
+		};
+		68AF399B730A506C794603A1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = "include_foleys_gui_magic.cpp";
+			path = "../../JuceLibraryCode/include_foleys_gui_magic.cpp";
+			sourceTree = "SOURCE_ROOT";
 		};
 		7517497654F2B9AEB0BF1B3B = {
 			isa = PBXFileReference;
@@ -585,6 +603,7 @@
 		497371FB2DFF6F2D45E86931 = {
 			isa = PBXGroup;
 			children = (
+				64510212442C3F8F729CAC0A,
 				D176DEB0501DBE55A3AEB421,
 				54E118F1C6905A2BAC0F98C0,
 				5701E627C8560150BA58EEF1,
@@ -605,6 +624,7 @@
 		A1BE149B617334A1AC0C75CD = {
 			isa = PBXGroup;
 			children = (
+				68AF399B730A506C794603A1,
 				0509E71BB07F6E7CA3731967,
 				E45C95A4652AF25CC96A97D0,
 				35975B17B5F2188074B15D4F,
@@ -759,6 +779,7 @@
 					"JUCE_DISPLAY_SPLASH_SCREEN=1",
 					"JUCE_USE_DARK_SPLASH_SCREEN=1",
 					"JUCE_PROJUCER_VERSION=0x60004",
+					"JUCE_MODULE_AVAILABLE_foleys_gui_magic=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_devices=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_formats=1",
@@ -823,6 +844,7 @@
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 					"$(inherited)",
@@ -835,6 +857,7 @@
 				MTL_HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 				);
@@ -878,6 +901,7 @@
 					"JUCE_DISPLAY_SPLASH_SCREEN=1",
 					"JUCE_USE_DARK_SPLASH_SCREEN=1",
 					"JUCE_PROJUCER_VERSION=0x60004",
+					"JUCE_MODULE_AVAILABLE_foleys_gui_magic=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_devices=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_formats=1",
@@ -942,6 +966,7 @@
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 					"$(inherited)",
@@ -955,6 +980,7 @@
 				MTL_HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 				);
@@ -998,6 +1024,7 @@
 					"JUCE_DISPLAY_SPLASH_SCREEN=1",
 					"JUCE_USE_DARK_SPLASH_SCREEN=1",
 					"JUCE_PROJUCER_VERSION=0x60004",
+					"JUCE_MODULE_AVAILABLE_foleys_gui_magic=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_devices=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_formats=1",
@@ -1062,6 +1089,7 @@
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 					"$(inherited)",
@@ -1074,6 +1102,7 @@
 				MTL_HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 				);
@@ -1118,6 +1147,7 @@
 					"JUCE_DISPLAY_SPLASH_SCREEN=1",
 					"JUCE_USE_DARK_SPLASH_SCREEN=1",
 					"JUCE_PROJUCER_VERSION=0x60004",
+					"JUCE_MODULE_AVAILABLE_foleys_gui_magic=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_devices=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_formats=1",
@@ -1182,6 +1212,7 @@
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 					"$(inherited)",
@@ -1195,6 +1226,7 @@
 				MTL_HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 				);
@@ -1237,6 +1269,7 @@
 					"JUCE_DISPLAY_SPLASH_SCREEN=1",
 					"JUCE_USE_DARK_SPLASH_SCREEN=1",
 					"JUCE_PROJUCER_VERSION=0x60004",
+					"JUCE_MODULE_AVAILABLE_foleys_gui_magic=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_devices=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_formats=1",
@@ -1300,6 +1333,7 @@
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 					"$(inherited)",
@@ -1310,6 +1344,7 @@
 				MTL_HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 				);
@@ -1350,6 +1385,7 @@
 					"JUCE_DISPLAY_SPLASH_SCREEN=1",
 					"JUCE_USE_DARK_SPLASH_SCREEN=1",
 					"JUCE_PROJUCER_VERSION=0x60004",
+					"JUCE_MODULE_AVAILABLE_foleys_gui_magic=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_devices=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_formats=1",
@@ -1413,6 +1449,7 @@
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 					"$(inherited)",
@@ -1424,6 +1461,7 @@
 				MTL_HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 				);
@@ -1465,6 +1503,7 @@
 					"JUCE_DISPLAY_SPLASH_SCREEN=1",
 					"JUCE_USE_DARK_SPLASH_SCREEN=1",
 					"JUCE_PROJUCER_VERSION=0x60004",
+					"JUCE_MODULE_AVAILABLE_foleys_gui_magic=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_devices=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_formats=1",
@@ -1528,6 +1567,7 @@
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 					"$(inherited)",
@@ -1537,6 +1577,7 @@
 				MTL_HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 				);
@@ -1578,6 +1619,7 @@
 					"JUCE_DISPLAY_SPLASH_SCREEN=1",
 					"JUCE_USE_DARK_SPLASH_SCREEN=1",
 					"JUCE_PROJUCER_VERSION=0x60004",
+					"JUCE_MODULE_AVAILABLE_foleys_gui_magic=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_devices=1",
 					"JUCE_MODULE_AVAILABLE_juce_audio_formats=1",
@@ -1641,6 +1683,7 @@
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 					"$(inherited)",
@@ -1651,6 +1694,7 @@
 				MTL_HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
+					"../../modules",
 					"/Applications/JUCE/modules",
 					"/Applications/JUCE/modules/juce_audio_plugin_client",
 				);
@@ -1997,6 +2041,7 @@
 			files = (
 				40A1A913568AFA2AFCC80BFC,
 				90531B0D5C1F7298A3107461,
+				5424BCC93F1048ED995BB526,
 				AFCF6152ED3DBF06D2160C8D,
 				F506546DDB129E7C33CC7FCC,
 				9DA763050F7055DBDD8FEF9F,
