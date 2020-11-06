@@ -70,7 +70,11 @@ private:
     juce::dsp::DelayLine <float> pong {192000};
     
     juce::dsp::DelayLine <float> dummyPing {192000};
-    juce::dsp::DelayLine <float> pingHelper {192000};
+    
+    juce::dsp::DelayLine <float> pingShift {192000};
+    juce::dsp::DelayLine <float> pongShift {192000};
+    
+    juce::dsp::DelayLine <float> dummyPingShift {192000};
     
     
     juce::AudioPlayHead* playHead;

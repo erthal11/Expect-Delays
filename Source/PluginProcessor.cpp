@@ -47,11 +47,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     auto mixParam = std::make_unique<juce::AudioParameterFloat>("mix","Mix", 0, 1, 0.5);
     params.push_back(std::move(mixParam));
     
-    auto pingpongParam = std::make_unique<juce::AudioParameterBool>("pingpong","Pingpong", false);
-    params.push_back(std::move(pingpongParam));
+    //auto pingpongParam = std::make_unique<juce::AudioParameterBool>("pingpong","Pingpong", false);
+    //params.push_back(std::move(pingpongParam));
     
     auto widthParam = std::make_unique<juce::AudioParameterFloat>("width","Width", 0, 1, 0);
     params.push_back(std::move(widthParam));
+    
+    auto pingShiftParam = std::make_unique<juce::AudioParameterFloat>("pingshift","Pingshift", 0, 1, 0);
+    params.push_back(std::move(pingShiftParam));
+    
+    auto pongShiftParam = std::make_unique<juce::AudioParameterFloat>("pongshift","Pongshift", 0, 1, 0);
+    params.push_back(std::move(pongShiftParam));
     
     return { params.begin(), params.end() };
 }
@@ -135,11 +141,17 @@ void ExpectDelaysAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     pong.prepare(spec);
     pong.reset();
     
-    pingHelper.prepare(spec);
-    pingHelper.reset();
+    pingShift.prepare(spec);
+    pingShift.reset();
+    
+    pongShift.prepare(spec);
+    pongShift.reset();
     
     dummyPing.prepare(spec);
     dummyPing.reset();
+    
+    dummyPingShift.prepare(spec);
+    dummyPingShift.reset();
 }
 
 void ExpectDelaysAudioProcessor::releaseResources()
@@ -205,7 +217,10 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     float outputR = 0;
     
     float outputLD = 0;
-    float outputLH = 0;
+    float outputLDS = 0;
+    
+    float outputLS = 0;
+    float outputRS = 0;
     
     
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
@@ -230,39 +245,49 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto feedbackR = treeState.getRawParameterValue("feedbackR");
     auto mix = treeState.getRawParameterValue("mix");
     
-    bool pingpong = (treeState.getRawParameterValue("pingpong"))->load();
+    auto pingshiftValue = (treeState.getRawParameterValue("pingshift"))->load() + 1;
+    auto pongshiftValue = (treeState.getRawParameterValue("pongshift"))->load();
+    
+    //bool pingpong = (treeState.getRawParameterValue("pingpong"))->load();
     
     auto width = (treeState.getRawParameterValue("width"))->load();
     
     float delayTime = noteMult(rate->load()) * sixtyFourthNote;
     
         
-    if (!pingpong)
-    {
-        ping.setDelay(delayTime);
-        pong.setDelay(delayTime);
-        
-        for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
-        {
-            
-            outputL = ping.popSample(0);
-            ping.pushSample(0, channelDataL[sample] + feedbackL->load() * outputL);
-            channelDataL[sample] = outputL;
-        
-            outputR = pong.popSample(1);
-            pong.pushSample(1, channelDataR[sample] + feedbackR->load() * outputR);
-            channelDataR[sample] = outputR;
-            
-        }
-    }
+//    if (!pingpong)
+//    {
+//        ping.setDelay(delayTime);
+//        pong.setDelay(delayTime);
+//
+//        for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
+//        {
+//
+//            outputL = ping.popSample(0);
+//            ping.pushSample(0, channelDataL[sample] + feedbackL->load() * outputL);
+//            channelDataL[sample] = outputL;
+//
+//            outputR = pong.popSample(1);
+//            pong.pushSample(1, channelDataR[sample] + feedbackR->load() * outputR);
+//            channelDataR[sample] = outputR;
+//
+//        }
+//    }
     
-    if (pingpong)
-    {
+    //if (pingpong)
+    //{
+        //pingpong implemented by setting left(ping) and right(pong) delay rates to twice rate value,
+        //then delaying the  left delayed signal by rate value,
+        //and adding a left dummy delay to fill in gap from delaying signal
+        //volumes and feedback were lowered to compensate, in order to simulate a normal delay decay
     
         ping.setDelay(2 * delayTime);
         pong.setDelay(2 * delayTime);
         
-        pingHelper.setDelay(delayTime);
+        pingShift.setDelay(delayTime * pingshiftValue);
+        dummyPingShift.setDelay(delayTime * pingshiftValue - delayTime);
+        pongShift.setDelay(delayTime * pongshiftValue);
+    
         dummyPing.setDelay(delayTime);
         
         double fbl = feedbackL->load() -.12;
@@ -273,27 +298,33 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             outputLD = dummyPing.popSample(0);
             dummyPing.pushSample(0, channelDataL[sample]);
             
+            dummyPingShift.pushSample(0, outputLD);
+            outputLDS = dummyPingShift.popSample(0);
+            
             outputL = ping.popSample(0);
             ping.pushSample(0, channelDataL[sample] + fbl * outputL);
 
-            pingHelper.pushSample(0, outputL);
-            outputLH = pingHelper.popSample(0) * pow(fbl,2);
+            pingShift.pushSample(0, outputL);
+            outputLS = pingShift.popSample(0) * pow(fbl,2);
             
-            if (fbl == 0)
-                outputLH =0;
-            if (feedbackR->load() == 0)
-                outputR =0;
+//            if (fbl == 0)
+//                outputLS =0;
+//            if (feedbackR->load() == 0)
+//                outputR =0;
                 
         
             outputR = pong.popSample(1) * feedbackR->load();
             pong.pushSample(1, channelDataR[sample] + feedbackR->load() * outputR);
             
-            channelDataL[sample] = outputLD + outputLH + (1-width)*outputR;
+            pongShift.pushSample(0, outputR);
+            outputRS = pongShift.popSample(0);
             
-            channelDataR[sample] = outputR + (1-width)*(outputLD + outputLH);
+            channelDataL[sample] = outputLDS + outputLS + (1-width)*outputRS;
+            
+            channelDataR[sample] = outputRS + (1-width)*(outputLDS + outputLS);
             
         }
-    }
+    //}
     
         
     
