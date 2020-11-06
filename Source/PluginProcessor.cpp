@@ -126,8 +126,17 @@ void ExpectDelaysAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
     
-    delayLine.prepare(spec);
-    delayLine.reset();
+    ping.prepare(spec);
+    ping.reset();
+    
+    pong.prepare(spec);
+    pong.reset();
+    
+    pingHelper.prepare(spec);
+    pingHelper.reset();
+    
+    dummyPing.prepare(spec);
+    dummyPing.reset();
 }
 
 void ExpectDelaysAudioProcessor::releaseResources()
@@ -192,6 +201,9 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     float outputL = 0;
     float outputR = 0;
     
+    float outputLD = 0;
+    float outputLH = 0;
+    
     
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
@@ -200,47 +212,93 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     float *cleanSignalR = new float[buffer.getNumSamples()];
 
     
-        auto* channelDataL = buffer.getWritePointer (0);
-        auto* channelDataR = buffer.getWritePointer (1);
+    auto* channelDataL = buffer.getWritePointer (0);
+    auto* channelDataR = buffer.getWritePointer (1);
+    
     
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
     {
         cleanSignalL[sample] = channelDataL[sample];
         cleanSignalR[sample] = channelDataR[sample];
     }
+    
+    auto rate = treeState.getRawParameterValue("rate");
+    auto feedbackL = treeState.getRawParameterValue("feedbackL");
+    auto feedbackR = treeState.getRawParameterValue("feedbackR");
+    auto mix = treeState.getRawParameterValue("mix");
+    
+    bool pingpong = (treeState.getRawParameterValue("pingpong"))->load();
+    
+    float delayTime = noteMult(rate->load()) * sixtyFourthNote;
+    
         
-        auto rate = treeState.getRawParameterValue("rate");
-        auto feedbackL = treeState.getRawParameterValue("feedbackL");
-        auto feedbackR = treeState.getRawParameterValue("feedbackR");
-        auto mix = treeState.getRawParameterValue("mix");
+    if (!pingpong)
+    {
+        ping.setDelay(delayTime);
+        pong.setDelay(delayTime);
         
-        delayLine.setDelay(noteMult(rate->load()) * sixtyFourthNote);
-        
-
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
-            outputL = delayLine.popSample(0);
-            delayLine.pushSample(0, channelDataL[sample] + feedbackL->load() * outputL);
+            
+            outputL = ping.popSample(0);
+            ping.pushSample(0, channelDataL[sample] + feedbackL->load() * outputL);
             channelDataL[sample] = outputL;
-            
-            outputR = delayLine.popSample(1);
-            delayLine.pushSample(1, channelDataR[sample] + feedbackR->load() * outputR);
+        
+            outputR = pong.popSample(1);
+            pong.pushSample(1, channelDataR[sample] + feedbackR->load() * outputR);
             channelDataR[sample] = outputR;
+            
         }
+    }
+    
+    if (pingpong)
+    {
         
-        //filtering goes here
-        //
+        ping.setDelay(2 * delayTime);
+        pong.setDelay(2 * delayTime);
         
-        // mixing dry + wet
+        pingHelper.setDelay(delayTime);
+        dummyPing.setDelay(delayTime);
+        
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
-            channelDataL[sample] = (channelDataL[sample] * mix->load()) + (cleanSignalL[sample] * (1-mix->load()));
             
-            channelDataR[sample] = (channelDataR[sample] * mix->load()) + (cleanSignalR[sample] * (1-mix->load()));
+            outputLD = dummyPing.popSample(0);
+            dummyPing.pushSample(0, channelDataL[sample]);
+            
+            outputL = ping.popSample(0);
+            ping.pushSample(0, channelDataL[sample] + feedbackL->load() * outputL);
+
+            pingHelper.pushSample(0, outputL);
+            outputLH = pingHelper.popSample(0);
+            
+            if (feedbackL->load() == 0)
+                channelDataL[sample] = outputLD;
+            else
+                channelDataL[sample] = outputLD + outputLH;
+                
+        
+            outputR = pong.popSample(1);
+            pong.pushSample(1, channelDataR[sample] + feedbackR->load() * outputR);
+            channelDataR[sample] = outputR;
+            
         }
+    }
         
     
-
+    //filtering goes here
+    //
+    
+    // mixing dry + wet
+    for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
+    {
+        channelDataL[sample] = (channelDataL[sample] * mix->load()) + (cleanSignalL[sample] * (1-mix->load()));
+        
+        channelDataR[sample] = (channelDataR[sample] * mix->load()) + (cleanSignalR[sample] * (1-mix->load()));
+    }
+    
+    
+    
 }
 
 //==============================================================================

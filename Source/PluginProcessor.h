@@ -63,9 +63,15 @@ public:
 
 private:
     
+    
     float lastSampleRate;
     
-    juce::dsp::DelayLine <float> delayLine {192000};
+    juce::dsp::DelayLine <float> ping {192000};
+    juce::dsp::DelayLine <float> pong {192000};
+    
+    juce::dsp::DelayLine <float> dummyPing {192000};
+    juce::dsp::DelayLine <float> pingHelper {192000};
+    
     
     juce::AudioPlayHead* playHead;
     juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
