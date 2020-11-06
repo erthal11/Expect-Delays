@@ -50,6 +50,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     auto pingpongParam = std::make_unique<juce::AudioParameterBool>("pingpong","Pingpong", false);
     params.push_back(std::move(pingpongParam));
     
+    auto widthParam = std::make_unique<juce::AudioParameterFloat>("width","Width", 0, 1, 0);
+    params.push_back(std::move(widthParam));
+    
     return { params.begin(), params.end() };
 }
 
@@ -229,6 +232,8 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     bool pingpong = (treeState.getRawParameterValue("pingpong"))->load();
     
+    auto width = (treeState.getRawParameterValue("width"))->load();
+    
     float delayTime = noteMult(rate->load()) * sixtyFourthNote;
     
         
@@ -253,12 +258,14 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     if (pingpong)
     {
-        
+    
         ping.setDelay(2 * delayTime);
         pong.setDelay(2 * delayTime);
         
         pingHelper.setDelay(delayTime);
         dummyPing.setDelay(delayTime);
+        
+        double fbl = feedbackL->load() -.12;
         
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
@@ -267,23 +274,27 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             dummyPing.pushSample(0, channelDataL[sample]);
             
             outputL = ping.popSample(0);
-            ping.pushSample(0, channelDataL[sample] + feedbackL->load() * outputL);
+            ping.pushSample(0, channelDataL[sample] + fbl * outputL);
 
             pingHelper.pushSample(0, outputL);
-            outputLH = pingHelper.popSample(0);
+            outputLH = pingHelper.popSample(0) * pow(fbl,2);
             
-            if (feedbackL->load() == 0)
-                channelDataL[sample] = outputLD;
-            else
-                channelDataL[sample] = outputLD + outputLH;
+            if (fbl == 0)
+                outputLH =0;
+            if (feedbackR->load() == 0)
+                outputR =0;
                 
         
-            outputR = pong.popSample(1);
+            outputR = pong.popSample(1) * feedbackR->load();
             pong.pushSample(1, channelDataR[sample] + feedbackR->load() * outputR);
-            channelDataR[sample] = outputR;
+            
+            channelDataL[sample] = outputLD + outputLH + (1-width)*outputR;
+            
+            channelDataR[sample] = outputR + (1-width)*(outputLD + outputLH);
             
         }
     }
+    
         
     
     //filtering goes here
