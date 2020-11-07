@@ -272,7 +272,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         //pingpong implemented by setting left(ping) and right(pong) delay rates to twice rate value,
         //then dshifting the left delayed signal by rate value,
         //and adding a left dummy delay to fill in gap from delaying signal
-        //volumes and feedback were lowered to compensate, in order to simulate a normal delay decay
+        //volumes and feedback were lowered to compensate, in order to simulate a decay of one delay
     
         ping.setDelay(2 * delayTime);
         pong.setDelay(2 * delayTime);
@@ -284,6 +284,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         dummyPing.setDelay(delayTime);
         
         double fbl = feedbackL->load() -.16;
+        if (fbl < 0.34) fbl = 0.34;
         
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
