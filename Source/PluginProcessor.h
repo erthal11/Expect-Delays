@@ -76,6 +76,15 @@ private:
     
     juce::dsp::DelayLine <float> dummyPingShift {192000};
     
+    float outputL = 0;
+    float outputR = 0;
+    
+    float outputLD = 0;
+    float outputLDS = 0;
+    
+    float outputLS = 0;
+    float outputRS = 0;
+    
     
     juce::AudioPlayHead* playHead;
     juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;

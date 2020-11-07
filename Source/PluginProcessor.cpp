@@ -35,7 +35,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     std::vector <std::unique_ptr<juce::RangedAudioParameter>> params;
     auto normRange = juce::NormalisableRange<float>(1.0,13.0,1);
     
-    auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", normRange,5.0);
+    auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", normRange,7.0);
     params.push_back(std::move(rateParam));
     
     auto fbLParam = std::make_unique<juce::AudioParameterFloat>("feedbackL","FeedbackL", 0, 1, 0.5);
@@ -44,13 +44,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     auto fbRParam = std::make_unique<juce::AudioParameterFloat>("feedbackR","FeedbackR", 0, 1, 0.5);
     params.push_back(std::move(fbRParam));
     
-    auto mixParam = std::make_unique<juce::AudioParameterFloat>("mix","Mix", 0, 1, 0.5);
+    auto mixParam = std::make_unique<juce::AudioParameterFloat>("mix","Mix", 0, 1, 0.25);
     params.push_back(std::move(mixParam));
     
     //auto pingpongParam = std::make_unique<juce::AudioParameterBool>("pingpong","Pingpong", false);
     //params.push_back(std::move(pingpongParam));
     
-    auto widthParam = std::make_unique<juce::AudioParameterFloat>("width","Width", 0, 1, 0);
+    auto widthParam = std::make_unique<juce::AudioParameterFloat>("width","Width", 0, 1, 1);
     params.push_back(std::move(widthParam));
     
     auto pingShiftParam = std::make_unique<juce::AudioParameterFloat>("pingshift","Pingshift", 0, 1, 0);
@@ -58,6 +58,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     
     auto pongShiftParam = std::make_unique<juce::AudioParameterFloat>("pongshift","Pongshift", 0, 1, 0);
     params.push_back(std::move(pongShiftParam));
+    
+    auto outputParam = std::make_unique<juce::AudioParameterFloat>("output","Output", -30, 30, 0);
+    params.push_back(std::move(outputParam));
     
     return { params.begin(), params.end() };
 }
@@ -213,27 +216,16 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     float const sixtyFourthNote = (60.0/bpm * lastSampleRate)/16.0;
     
-    float outputL = 0;
-    float outputR = 0;
-    
-    float outputLD = 0;
-    float outputLDS = 0;
-    
-    float outputLS = 0;
-    float outputRS = 0;
-    
-    
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
     float *cleanSignalL = new float[buffer.getNumSamples()];
     float *cleanSignalR = new float[buffer.getNumSamples()];
 
-    
     auto* channelDataL = buffer.getWritePointer (0);
     auto* channelDataR = buffer.getWritePointer (1);
     
-    
+    // copy samples for a clean signal
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
     {
         cleanSignalL[sample] = channelDataL[sample];
@@ -244,6 +236,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto feedbackL = treeState.getRawParameterValue("feedbackL");
     auto feedbackR = treeState.getRawParameterValue("feedbackR");
     auto mix = treeState.getRawParameterValue("mix");
+    auto output =treeState.getRawParameterValue("output")->load();
     
     auto pingshiftValue = (treeState.getRawParameterValue("pingshift"))->load() + 1;
     auto pongshiftValue = (treeState.getRawParameterValue("pongshift"))->load();
@@ -277,7 +270,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     //if (pingpong)
     //{
         //pingpong implemented by setting left(ping) and right(pong) delay rates to twice rate value,
-        //then delaying the  left delayed signal by rate value,
+        //then dshifting the left delayed signal by rate value,
         //and adding a left dummy delay to fill in gap from delaying signal
         //volumes and feedback were lowered to compensate, in order to simulate a normal delay decay
     
@@ -290,7 +283,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
         dummyPing.setDelay(delayTime);
         
-        double fbl = feedbackL->load() -.12;
+        double fbl = feedbackL->load() -.16;
         
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
@@ -305,14 +298,13 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             ping.pushSample(0, channelDataL[sample] + fbl * outputL);
 
             pingShift.pushSample(0, outputL);
-            outputLS = pingShift.popSample(0) * pow(fbl,2);
+            outputLS = pingShift.popSample(0) * pow(fbl,1.5);
             
 //            if (fbl == 0)
 //                outputLS =0;
 //            if (feedbackR->load() == 0)
 //                outputR =0;
                 
-        
             outputR = pong.popSample(1) * feedbackR->load();
             pong.pushSample(1, channelDataR[sample] + feedbackR->load() * outputR);
             
@@ -326,17 +318,15 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         }
     //}
     
-        
-    
     //filtering goes here
     //
     
     // mixing dry + wet
     for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
     {
-        channelDataL[sample] = (channelDataL[sample] * mix->load()) + (cleanSignalL[sample] * (1-mix->load()));
+        channelDataL[sample] = ((channelDataL[sample] * mix->load()) + (cleanSignalL[sample] * (1-mix->load()))) * juce::Decibels::decibelsToGain(output);
         
-        channelDataR[sample] = (channelDataR[sample] * mix->load()) + (cleanSignalR[sample] * (1-mix->load()));
+        channelDataR[sample] = ((channelDataR[sample] * mix->load()) + (cleanSignalR[sample] * (1-mix->load()))) * juce::Decibels::decibelsToGain(output);
     }
     
     
@@ -361,12 +351,20 @@ void ExpectDelaysAudioProcessor::getStateInformation (juce::MemoryBlock& destDat
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    auto state = treeState.copyState();
+            std::unique_ptr<juce::XmlElement> xml (state.createXml());
+            copyXmlToBinary (*xml, destData);
 }
 
 void ExpectDelaysAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+     
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName (treeState.state.getType()))
+            treeState.replaceState (juce::ValueTree::fromXml (*xmlState));
 }
 
 //==============================================================================
