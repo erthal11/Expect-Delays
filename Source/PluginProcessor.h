@@ -56,18 +56,16 @@ public:
     juce::AudioProcessorValueTreeState treeState;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     
-    void updateDelay();
-    
     foleys::MagicProcessorState magicState { *this, treeState };
+    
+    void updateFilter();
 
 
 private:
     
     
-    float lastSampleRate;
-    
-    juce::dsp::DelayLine <float> ping {192000};
-    juce::dsp::DelayLine <float> pong {192000};
+    juce::dsp::DelayLine <float> ping {400000};
+    juce::dsp::DelayLine <float> pong {400000};
     
     juce::dsp::DelayLine <float> dummyPing {192000};
     
@@ -88,6 +86,12 @@ private:
     
     juce::AudioPlayHead* playHead;
     juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
+    
+    juce::dsp::ProcessorDuplicator <juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients <float>> lowPassFilter;
+    
+    juce::dsp::ProcessorDuplicator <juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients <float>> highPassFilter;
+    
+    float lastSampleRate;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ExpectDelaysAudioProcessor)

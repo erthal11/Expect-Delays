@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<magic>
+  <Styles>
+    <Style name="default">
+      <Nodes/>
+      <Classes>
+        <plot-view border="2" background-color="black" border-color="silver" display="contents"/>
+        <nomargin margin="0" padding="0" border="0"/>
+        <group margin="5" padding="5" border="2" flex-direction="column"/>
+      </Classes>
+      <Types>
+        <Slider border="0" slider-textbox="textbox-below" slider-type="rotary-horizontal-vertical"
+                background-color="" caption-placement="centred-top" caption-size=""/>
+        <ToggleButton border="0" max-height="50" caption-size="0" text="Active"/>
+        <TextButton border="0" max-height="50" caption-size="0"/>
+        <ComboBox border="0" max-height="50" caption-size="0"/>
+        <Plot border="0" margin="0" padding="0" background-color="00000000"
+              radius="0"/>
+        <XYDragComponent border="0" margin="0" padding="0" background-color="00000000"
+                         radius="0"/>
+      </Types>
+      <Palettes>
+        <default/>
+      </Palettes>
+    </Style>
+  </Styles>
+  <View id="root" resizable="1" resize-corner="1" border="10" border-color="FFAA5E00"
+        background-color="FFC06A00" lookAndFeel="FoleysFinest" background-gradient="none(0% ffb7920a,100% ffffffff)"
+        background-alpha="" radius="10" tooltip="" caption-size="50"
+        caption-color="FF000000" caption="">
+    <View flex-direction="column" margin="0" id="rate/fb" background-color="FFC06A00">
+      <View flex-direction="column" background-color="FFC06A00" margin="0"
+            padding="0" caption="Expect Delays" caption-size="32" caption-color="FFFFFFFF"
+            border="" lookAndFeel="FoleysFinest" height="30" caption-placement="centred-top">
+        <Slider caption="Rate" parameter="rate" lookAndFeel="FoleysFinest" slider-type="rotary-horizontal-vertical"
+                background-color="FFC06A00" padding="0" margin="0" caption-color="FF000000"
+                caption-size="25" slider-textbox="textbox-below"/>
+      </View>
+      <View background-color="FFC06A00" margin="0" padding="0">
+        <Slider caption="FB Left" parameter="feedbackL" slider-type="linear-vertical"
+                lookAndFeel="LookAndFeel_V4" background-color="FFC06A00" margin="0"
+                padding="0" caption-color="FF000000" caption-size="25"/>
+        <Slider caption="FB Right" parameter="feedbackR" slider-type="linear-vertical"
+                lookAndFeel="LookAndFeel_V4" background-color="FFC06A00" margin="0"
+                padding="0" border-color="" caption-color="FF000000" caption-size="25"/>
+      </View>
+    </View>
+    <View flex-direction="column" display="flexbox" margin="0" id="pingpong"
+          background-color="FFC06A00" repaint-hz="" flex-wrap="nowrap"
+          flex-align-content="stretch" flex-align-items="stretch">
+      <View flex-wrap="nowrap" flex-align-content="stretch" flex-justify-content="start"
+            flex-direction="row" padding="10" margin="10" id="visual" border="5"
+            radius="10" border-color="FF000000" background-color="FFFFC378">
+        <View margin="0" padding="10" flex-direction="column" id="ping" background-color="FFFFC378"
+              border-color="FF000000" border="">
+          <XYDragComponent parameter-x="width" parameter-y="pingshift" margin="0" padding="0"
+                           xy-drag-handle="FFFFC378" xy-crosshair="no-crosshair" background-color="FFFFC378"
+                           xy-drag-handle-over="FFFFC378" border="1" border-color=""/>
+          <XYDragComponent xy-drag-handle-over="FF1998FF" xy-drag-handle="FF002DFF" parameter-x="width"
+                           parameter-y="pingshift" margin="1" padding="0" xy-crosshair="vertical"
+                           xy-vertical="FF000000" xy-vertical-over="FF1998FF" background-color="FFFFC378"
+                           border="0" border-color="FF000000"/>
+          <XYDragComponent parameter-x="width" parameter-y="pingshift" xy-drag-handle="FFFFC378"
+                           xy-drag-handle-over="FFFFC378" xy-crosshair="no-crosshair" background-color="FFFFC378"
+                           border="" padding="" margin=""/>
+          <XYDragComponent parameter-x="width" parameter-y="pingshift" xy-crosshair="vertical"
+                           xy-drag-handle="FF002DFF" xy-drag-handle-over="FF1998FF" xy-vertical="FF000000"
+                           xy-vertical-over="FF1998FF" background-color="FFFFC378" border="0"
+                           padding="0" margin="0" border-color=""/>
+        </View>
+        <View flex-direction="column" id="pong" margin="0" padding="0" caption-placement=""
+              background-color="FFFFC378">
+          <XYDragComponent parameter-x="width" parameter-y="pongshift" padding="0" border=""
+                           margin="0" xy-crosshair="vertical" xy-drag-handle="FF9000A5"
+                           xy-drag-handle-over="FFE600FF" xy-vertical="FF000000" xy-vertical-over="FFE600FF"
+                           background-color="FFFFC378"/>
+          <XYDragComponent parameter-x="width" parameter-y="pongshift" margin="0" padding="0"
+                           xy-crosshair="no-crosshair" xy-drag-handle="FFFFC378" xy-drag-handle-over="FFFFC378"
+                           background-color="FFFFC378" xy-horizontal-over="" xy-vertical-over=""/>
+          <XYDragComponent parameter-x="width" parameter-y="pongshift" flex-align-self="stretch"
+                           flex-order="0" lookAndFeel="FoleysFinest" padding="0" margin="0"
+                           xy-crosshair="vertical" xy-drag-handle="FF9000A5" xy-drag-handle-over="FFE600FF"
+                           xy-horizontal="" xy-vertical="FF000000" xy-vertical-over="FFE600FF"
+                           background-color="FFFFC378"/>
+          <XYDragComponent parameter-x="width" parameter-y="pongshift" margin="0" padding="0"
+                           xy-crosshair="no-crosshair" xy-drag-handle="FFFFC378" xy-drag-handle-over="FFFFC378"
+                           background-color="FFFFC378"/>
+        </View>
+      </View>
+      <View flex-direction="column" id="knobs" margin="0" padding="0" background-color="FFC06A00">
+        <View id="shifts" margin="0" padding="0" background-color="FFC06A00"
+              caption-size="">
+          <Slider caption="Left Shift" parameter="pingshift" slider-type="rotary-horizontal-vertical"
+                  lookAndFeel="Skeuomorphic" margin="0" padding="0" background-color="FFC06A00"
+                  caption-color="FF000000" caption-size="25"/>
+          <Slider caption="Right Shift" parameter="pongshift" slider-type="rotary-horizontal-vertical"
+                  lookAndFeel="Skeuomorphic" margin="0" padding="0" background-color="FFC06A00"
+                  caption-color="FF000000" caption-size="25"/>
+        </View>
+        <Slider caption="Width" parameter="width" caption-placement="centred-top"
+                lookAndFeel="Skeuomorphic" slider-type="rotary-horizontal-vertical"
+                margin="0" padding="0" background-color="FFC06A00" caption-color="FF000000"
+                caption-size="25"/>
+      </View>
+    </View>
+    <View flex-direction="column" margin="0" tooltip="" id="filters/mix/output"
+          background-color="FFC06A00">
+      <View id="filters" background-color="FFC06A00" caption-size="">
+        <Slider parameter="highpass" id="" caption="Highpass" caption-color="FF000000"
+                background-color="FFC06A00" caption-size="25" lookAndFeel="FoleysFinest"
+                margin="0" padding="0"/>
+        <Slider parameter="lowpass" id="" caption-color="FF000000" caption="Lowpass"
+                background-color="FFC06A00" caption-size="25" lookAndFeel="FoleysFinest"
+                margin="0" padding="0"/>
+      </View>
+      <View flex-direction="row" padding="0" background-color="FFC06A00"
+            id="mix/output" margin="0">
+        <Slider caption="Mix" parameter="mix" slider-type="linear-vertical" background-color="FFC06A00"
+                caption-color="FF000000" caption-size="25" margin="0" padding="0"/>
+        <Slider caption="Output" parameter="output" slider-type="linear-vertical"
+                background-color="FFC06A00" caption-color="FF000000" caption-size="25"
+                margin="0" padding="0" lookAndFeel="LookAndFeel_V4"/>
+      </View>
+    </View>
+  </View>
+</magic>
+ 

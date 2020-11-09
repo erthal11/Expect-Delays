@@ -81,6 +81,10 @@
 			isa = PBXBuildFile;
 			fileRef = CBF893D6EEF9AA8791EDC3AD;
 		};
+		EA334BCAC09730A875905B70 = {
+			isa = PBXBuildFile;
+			fileRef = EF5600448E9F78BA6D0E792C;
+		};
 		5424BCC93F1048ED995BB526 = {
 			isa = PBXBuildFile;
 			fileRef = 68AF399B730A506C794603A1;
@@ -173,6 +177,13 @@
 			lastKnownFileType = sourcecode.cpp.objcpp;
 			name = "include_juce_audio_basics.mm";
 			path = "../../JuceLibraryCode/include_juce_audio_basics.mm";
+			sourceTree = "SOURCE_ROOT";
+		};
+		07F4D51649352B09F75762DB = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = BinaryData.h;
+			path = ../../JuceLibraryCode/BinaryData.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		1D68F7C9C62406A1483B7C16 = {
@@ -287,6 +298,13 @@
 			path = "/Applications/JUCE/modules/juce_audio_devices";
 			sourceTree = "<absolute>";
 		};
+		5701E627C8560150BA58EEF1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = "juce_audio_formats";
+			path = "/Applications/JUCE/modules/juce_audio_formats";
+			sourceTree = "<absolute>";
+		};
 		610969933036667C1113B056 = {
 			isa = PBXFileReference;
 			lastKnownFileType = text.plist.xml;
@@ -321,13 +339,6 @@
 			name = "include_juce_audio_plugin_client_AU.r";
 			path = "../../JuceLibraryCode/include_juce_audio_plugin_client_AU.r";
 			sourceTree = "SOURCE_ROOT";
-		};
-		5701E627C8560150BA58EEF1 = {
-			isa = PBXFileReference;
-			lastKnownFileType = file;
-			name = "juce_audio_formats";
-			path = "/Applications/JUCE/modules/juce_audio_formats";
-			sourceTree = "<absolute>";
 		};
 		59F6E153F9F792B80E9A8531 = {
 			isa = PBXFileReference;
@@ -377,6 +388,13 @@
 			name = "juce_gui_basics";
 			path = "/Applications/JUCE/modules/juce_gui_basics";
 			sourceTree = "<absolute>";
+		};
+		867AA3B0F6EF7C5155087247 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = "Expect Delays";
+			path = "../../Resources/Expect Delays";
+			sourceTree = "SOURCE_ROOT";
 		};
 		89380720800F335DD3C36180 = {
 			isa = PBXFileReference;
@@ -567,6 +585,13 @@
 			path = "../../JuceLibraryCode/include_juce_gui_extra.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
+		EF5600448E9F78BA6D0E792C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = BinaryData.cpp;
+			path = ../../JuceLibraryCode/BinaryData.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		F0303E5185E9AD121FBDA0CA = {
 			isa = PBXFileReference;
 			lastKnownFileType = file.nib;
@@ -592,10 +617,19 @@
 			name = Source;
 			sourceTree = "<group>";
 		};
+		4EE38EC0D3E2A39A6AF69C06 = {
+			isa = PBXGroup;
+			children = (
+				867AA3B0F6EF7C5155087247,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		E7038557B7F9313AA151821B = {
 			isa = PBXGroup;
 			children = (
 				0BEC55482AD697C8999CCBE5,
+				4EE38EC0D3E2A39A6AF69C06,
 			);
 			name = "Expect Delays";
 			sourceTree = "<group>";
@@ -624,6 +658,8 @@
 		A1BE149B617334A1AC0C75CD = {
 			isa = PBXGroup;
 			children = (
+				EF5600448E9F78BA6D0E792C,
+				07F4D51649352B09F75762DB,
 				68AF399B730A506C794603A1,
 				0509E71BB07F6E7CA3731967,
 				E45C95A4652AF25CC96A97D0,
@@ -2041,6 +2077,7 @@
 			files = (
 				40A1A913568AFA2AFCC80BFC,
 				90531B0D5C1F7298A3107461,
+				EA334BCAC09730A875905B70,
 				5424BCC93F1048ED995BB526,
 				AFCF6152ED3DBF06D2160C8D,
 				F506546DDB129E7C33CC7FCC,

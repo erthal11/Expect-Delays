@@ -13,6 +13,9 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="HMXCkI" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <GROUP id="{070EE3C3-133B-E035-1C01-8A979837982F}" name="Resources">
+      <FILE id="vtzDEX" name="Expect Delays" compile="0" resource="1" file="Resources/Expect Delays"/>
+    </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>
