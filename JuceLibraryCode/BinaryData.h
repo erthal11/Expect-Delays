@@ -9,7 +9,7 @@
 namespace BinaryData
 {
     extern const char*   Expect_Delays;
-    const int            Expect_DelaysSize = 8228;
+    const int            Expect_DelaysSize = 8531;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
     const int namedResourceListSize = 1;

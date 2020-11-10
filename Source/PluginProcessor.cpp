@@ -37,11 +37,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     std::vector <std::unique_ptr<juce::RangedAudioParameter>> params;
     
     auto normRangeRate = juce::NormalisableRange<float>(1,19,1);
-    
-    auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", normRangeRate,7.0);
+    auto rateParam = std::make_unique<juce::AudioParameterFloat>("rate","Rate", normRangeRate,10);
     params.push_back(std::move(rateParam));
     
-    auto fbLParam = std::make_unique<juce::AudioParameterFloat>("feedbackL","FeedbackL", 0, 1, 0.5);
+    auto normRangePingFB = juce::NormalisableRange<float>(0,1,.01);
+    normRangePingFB.setSkewForCentre(0.25);
+    auto fbLParam = std::make_unique<juce::AudioParameterFloat>("feedbackL","FeedbackL", normRangePingFB, 0.25);
     params.push_back(std::move(fbLParam));
     
     auto fbRParam = std::make_unique<juce::AudioParameterFloat>("feedbackR","FeedbackR", 0, 1, 0.5);
@@ -62,7 +63,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ExpectDelaysAudioProcessor::
     auto pongShiftParam = std::make_unique<juce::AudioParameterFloat>("pongshift","Pongshift", 0, 1, 0.06);
     params.push_back(std::move(pongShiftParam));
     
-    auto outputParam = std::make_unique<juce::AudioParameterFloat>("output","Output", -30, 30, 0);
+    auto outputParam = std::make_unique<juce::AudioParameterFloat>("output","Output", -10, 10, 0);
     params.push_back(std::move(outputParam));
     
     auto normRangeFilters = juce::NormalisableRange<float>(20,20000);
@@ -339,8 +340,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
         dummyPing.setDelay(delayTime);
         
-        double fbl = feedbackL->load() -.16;
-        if (fbl < 0.34) fbl = 0.34;
+        double fbl = feedbackL->load();
         
         for (int sample = 0; sample<buffer.getNumSamples(); ++sample)
         {
@@ -355,7 +355,7 @@ void ExpectDelaysAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             ping.pushSample(0, channelDataL[sample] + fbl * outputL);
 
             pingShift.pushSample(0, outputL);
-            outputLS = pingShift.popSample(0) * pow(fbl,1.5);
+            outputLS = pingShift.popSample(0) * fbl;
             
 //            if (fbl == 0)
 //                outputLS =0;

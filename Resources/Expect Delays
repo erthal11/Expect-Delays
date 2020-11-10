@@ -35,15 +35,16 @@
             border="" lookAndFeel="FoleysFinest" height="30" caption-placement="centred-top">
         <Slider caption="Rate" parameter="rate" lookAndFeel="FoleysFinest" slider-type="rotary-horizontal-vertical"
                 background-color="FFC06A00" padding="0" margin="0" caption-color="FF000000"
-                caption-size="25" slider-textbox="textbox-below"/>
+                caption-size="25" slider-textbox="no-textbox"/>
       </View>
       <View background-color="FFC06A00" margin="0" padding="0">
         <Slider caption="FB Left" parameter="feedbackL" slider-type="linear-vertical"
                 lookAndFeel="LookAndFeel_V4" background-color="FFC06A00" margin="0"
-                padding="0" caption-color="FF000000" caption-size="25"/>
+                padding="0" caption-color="FF000000" caption-size="25" slider-textbox="no-textbox"/>
         <Slider caption="FB Right" parameter="feedbackR" slider-type="linear-vertical"
                 lookAndFeel="LookAndFeel_V4" background-color="FFC06A00" margin="0"
-                padding="0" border-color="" caption-color="FF000000" caption-size="25"/>
+                padding="0" border-color="" caption-color="FF000000" caption-size="25"
+                slider-textbox="no-textbox"/>
       </View>
     </View>
     <View flex-direction="column" display="flexbox" margin="0" id="pingpong"
@@ -90,18 +91,18 @@
       </View>
       <View flex-direction="column" id="knobs" margin="0" padding="0" background-color="FFC06A00">
         <View id="shifts" margin="0" padding="0" background-color="FFC06A00"
-              caption-size="">
-          <Slider caption="Left Shift" parameter="pingshift" slider-type="rotary-horizontal-vertical"
-                  lookAndFeel="Skeuomorphic" margin="0" padding="0" background-color="FFC06A00"
+              caption-size="" max-height="300" height="60">
+          <Slider caption="Left Shift" parameter="pingshift" slider-type="linear-vertical"
+                  lookAndFeel="LookAndFeel_V1" margin="0" padding="0" background-color="FFC06A00"
                   caption-color="FF000000" caption-size="25"/>
-          <Slider caption="Right Shift" parameter="pongshift" slider-type="rotary-horizontal-vertical"
-                  lookAndFeel="Skeuomorphic" margin="0" padding="0" background-color="FFC06A00"
+          <Slider caption="Right Shift" parameter="pongshift" slider-type="linear-vertical"
+                  lookAndFeel="LookAndFeel_V1" margin="0" padding="0" background-color="FFC06A00"
                   caption-color="FF000000" caption-size="25"/>
         </View>
         <Slider caption="Width" parameter="width" caption-placement="centred-top"
-                lookAndFeel="Skeuomorphic" slider-type="rotary-horizontal-vertical"
-                margin="0" padding="0" background-color="FFC06A00" caption-color="FF000000"
-                caption-size="25"/>
+                lookAndFeel="Skeuomorphic" slider-type="linear-horizontal" margin="0"
+                padding="0" background-color="FFC06A00" caption-color="FF000000"
+                caption-size="25" min-height="0" height=""/>
       </View>
     </View>
     <View flex-direction="column" margin="0" tooltip="" id="filters/mix/output"
